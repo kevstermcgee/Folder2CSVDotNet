@@ -6,6 +6,7 @@ namespace Folder2CSVDotNet
 {
     public class Record
     {
+        public string Filelink { get; set; }
         public string Filepath { get; set; }
         public string Folder { get; set; }
         public string Filename { get; set; }
@@ -18,7 +19,7 @@ namespace Folder2CSVDotNet
     {
         static void Main()
         {
-            Console.WriteLine("Enter root folder path: ");
+            Console.Write("Enter root folder path: ");
             string rootPath = Console.ReadLine()?.Trim('"', ' ');
             
             Stopwatch stopwatch = new Stopwatch();
@@ -45,7 +46,9 @@ namespace Folder2CSVDotNet
             
             // If CSV exists, delete it to start fresh
             if (File.Exists(csvFilePath))
+            {
                 File.Delete(csvFilePath);
+            }
 
             using (var writer = new StreamWriter(csvFilePath))
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
@@ -72,7 +75,7 @@ namespace Folder2CSVDotNet
                 {
                     var record = GetMetaData(file);
                     csv.WriteRecord(record);
-                    csv.NextRecord(); // Move to next line
+                    csv.NextRecord(); // Move to the next line
                 }
 
                 foreach (string dir in Directory.GetDirectories(path))
@@ -105,6 +108,7 @@ namespace Folder2CSVDotNet
             var fileInfo = new FileInfo(path);
             return new Record
             {
+                Filelink = $"=HYPERLINK(\"{fileInfo.FullName}\", \"Open\")", // Excel formula
                 Filepath = fileInfo.FullName,
                 Folder = fileInfo.DirectoryName,
                 Filename = fileInfo.Name,
